@@ -15,8 +15,8 @@
 ## Features
 
 - **Article summaries.** A short gist and key points, written for listening.
-- **Comment analysis.** Every comment is scored for first-hand experience, corrections and substance. Votes are hidden on HN, so this finds the comments worth your time without them.
-- **Thread sentiment.** The top 15 comments are labeled agree, disagree, mixed or neutral, with the strongest voice on each side.
+- **Comment analysis.** HN hides vote counts but sorts comments by them, so the app starts from the top of HN's own ranking, scores those comments for first-hand experience, corrections and substance, and picks the best. Each card shows its HN rank, like "#1 of 53".
+- **Thread sentiment.** The top 15 comments in HN's ranking are labeled agree, disagree, mixed or neutral, with the strongest voice on each side.
 - **Analyze in depth.** On request, Claude maps the main debates and gives its own take.
 - **Full threads.** Tap any comment to open its whole conversation, root to leaf, with working links.
 - **Listen.** A local voice (Kokoro) reads each card. Free, offline, cached after the first play.
