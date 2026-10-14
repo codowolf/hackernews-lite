@@ -1,0 +1,162 @@
+# Everything tunable lives here. Secrets (API keys) are not kept here: put TYPESAFE_API_KEY in
+# .env (see .env.example) or export it.
+
+[paths]
+data_dir = "data"
+prompts_dir = "prompts"
+
+[feeds]
+default = "daily"
+max_age_minutes = 60   # a list older than this is refreshed when you open it
+
+# The tabs at the top of the app, in order. kind: "daily" = each day on its own, with the choice
+# of how much of the day to show (see [daily] below); "front_page" = HN's front page right now;
+# "window" = the most upvoted stories posted within window_hours; "best" = HN's /best list.
+[[feeds.items]]
+id = "daily"
+label = "Daily"
+title = "Best of each day"
+kind = "daily"
+
+[[feeds.items]]
+id = "top"
+label = "Top"
+title = "Top stories now"
+kind = "front_page"
+limit = 30
+
+[[feeds.items]]
+id = "24h"
+label = "24h"
+title = "Last 24 hours"
+kind = "window"
+window_hours = 24
+min_points = 50
+
+[[feeds.items]]
+id = "48h"
+label = "48h"
+title = "Last 48 hours"
+kind = "window"
+window_hours = 48
+min_points = 100
+
+[[feeds.items]]
+id = "week"
+label = "Week"
+title = "Last week"
+kind = "window"
+window_hours = 168
+min_points = 200
+
+[[feeds.items]]
+id = "best"
+label = "Best"
+title = "Best stories"
+kind = "best"
+
+# The Daily list, like hckrnews.com: each day (UTC) gets its own section. Pick how much of each
+# day to show with the buttons in the app. A story must reach `min_points` to count at all.
+# A mode is a `count` (the best N stories of the day) or a `percent` (the best share of them);
+# a mode with neither shows every story. Hacker News does not keep a history of its front page,
+# so there is no "homepage" mode.
+[daily]
+default_mode = "top5"
+page_days = 4      # days shown at first, and added by each "Show earlier days"
+max_days = 30      # how far back you can go
+min_points = 30
+
+[[daily.modes]]
+id = "top5"
+label = "Top 5"
+count = 5
+
+[[daily.modes]]
+id = "top10"
+label = "Top 10"
+count = 10
+
+[[daily.modes]]
+id = "top20"
+label = "Top 20"
+count = 20
+
+[budget]
+monthly_usd = 10.0  # paid calls stop when this is reached
+
+[llm]
+provider = "claude_code"  # "claude_code" runs `claude -p` on your subscription; "anthropic" uses ANTHROPIC_API_KEY
+
+[llm.article_prep]
+model = "claude-haiku-5-5"
+effort = "low"
+max_tokens = 2000
+
+# "Analyze in depth": Claude reads the thread and writes the headline, debates and its take.
+# Only runs when you ask for it on a story's page. Haiku did about as well as Sonnet in testing
+# at a twentieth of the cost; switch to "claude-sonnet-5-5" if you want its sharper takes.
+[llm.stance]
+model = "claude-haiku-5-5"
+effort = "low"
+max_tokens = 6000
+
+# Bold highlights for the quotes Jev picked: a tiny call that sees only the picked quotes.
+[llm.highlight]
+model = "claude-haiku-5-5"
+effort = "low"
+max_tokens = 1500
+
+[llm.comment_curation]
+model = "claude-haiku-5-5"  # cheapest first; compare against claude-sonnet-5-5 on a few threads
+effort = "medium"
+max_tokens = 6000
+
+[speech]
+provider = "kokoro"  # runs on this Mac for free
+voice = "af_heart"    # default voice; the app lets you switch
+
+[trending]
+min_points_per_hour = 30  # a story's upvote count turns orange at this many upvotes per hour since posting...
+min_comments = 500        # ...and its comment count turns orange at this many
+min_points = 100          # but never below this many upvotes
+
+[curation]
+methods = ["jev"]   # which comment pickers run: "jev" is cheap (no Claude tokens); "llm" has Claude read the thread too
+min_score = 0.35    # jev picker: weakest composite score allowed, 0 to 1
+max_picks = 8
+max_per_thread = 2
+stance = "quick"    # how the thread's reaction is made: "quick" (Jev labels the top comments, no Claude
+                    # tokens), "deep" (Claude reads the whole thread for every story) or "off".
+                    # Debates and the model's take are made on demand: "Analyze in depth" on the page.
+
+# Jev picker: how much each signal counts. Negative = penalty. Editing these costs nothing;
+# the raw scores are cached per comment.
+[curation.weights]
+first_hand = 3.0    # describes their own experience or expertise
+corrects = 2.0      # corrects or caveats the article
+substance = 2.0     # specific and well argued
+adds_info = 1.5     # adds facts, numbers, alternatives
+standalone = 1.0    # makes sense without the comments above
+hostile = -3.0      # attack, flame, pile-on
+
+[prepare]
+on_open = true    # opening a story analyzes it right away if it has not been analyzed yet
+list_top = 5      # and the first N stories of each list you open are made ready in the background
+
+[jev]
+model = "jev-latest"
+workers = 8
+
+# USD per million tokens. From the Anthropic pricing table, 2026-10-06. Re-check when models change.
+[pricing."claude-haiku-5-5"]
+input = 0.10
+output = 0.50
+
+[pricing."claude-sonnet-5-5"]
+input = 2.00
+output = 10.00
+
+# TypeSafe: $42 per billion input tokens, output free (docs.typesafe.ai/models, 2026-10-12).
+[pricing."jev-latest"]
+input = 0.042
+output = 0.0

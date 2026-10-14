@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#f6f4ef" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#121110" media="(prefers-color-scheme: dark)">
+  <title>Hackernews Lite</title>
+  <script>
+    // Apply a saved or ?theme= choice before first paint, so there is no flash.
+    try {
+      const t = new URLSearchParams(location.search).get("theme") || localStorage.getItem("theme");
+      if (t === "light" || t === "dark") document.documentElement.dataset.theme = t;
+    } catch (e) { /* storage blocked: follow the device */ }
+  </script>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <!-- Icon sprite: one place for every icon, so buttons never depend on emoji fonts. -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z"/></symbol>
+    <symbol id="i-pause" viewBox="0 0 24 24"><rect x="6" y="5" width="4" height="14" rx="1.2"/><rect x="14" y="5" width="4" height="14" rx="1.2"/></symbol>
+    <symbol id="i-prev" viewBox="0 0 24 24"><rect x="5" y="5" width="2.4" height="14" rx="1.2"/><path d="M19 6.2v11.6a.8.8 0 0 1-1.25.66L9.4 12.66a.8.8 0 0 1 0-1.32l8.35-5.8A.8.8 0 0 1 19 6.2z"/></symbol>
+    <symbol id="i-next" viewBox="0 0 24 24"><rect x="16.6" y="5" width="2.4" height="14" rx="1.2"/><path d="M5 6.2v11.6a.8.8 0 0 0 1.25.66l8.35-5.8a.8.8 0 0 0 0-1.32l-8.35-5.8A.8.8 0 0 0 5 6.2z"/></symbol>
+    <symbol id="i-skip" viewBox="0 0 24 24"><path d="M5 6.2v11.6a.8.8 0 0 0 1.25.66l6.3-4.4a.8.8 0 0 0 0-1.32l-6.3-4.4A.8.8 0 0 0 5 6.2zM12.5 6.2v11.6a.8.8 0 0 0 1.25.66l6.3-4.4a.8.8 0 0 0 0-1.32l-6.3-4.4a.8.8 0 0 0-1.25.66z"/></symbol>
+    <symbol id="i-up" viewBox="0 0 24 24"><path d="M12 5.2c.4 0 .8.2 1 .55l6.2 9.9a1.2 1.2 0 0 1-1 1.85H5.8a1.2 1.2 0 0 1-1-1.85l6.2-9.9c.2-.35.6-.55 1-.55z"/></symbol>
+    <symbol id="i-comment" viewBox="0 0 24 24"><path d="M5.5 4h13A2.5 2.5 0 0 1 21 6.5v8a2.5 2.5 0 0 1-2.5 2.5H11l-4.2 3.5a.6.6 0 0 1-1-.46V17h-.3A2.5 2.5 0 0 1 3 14.5v-8A2.5 2.5 0 0 1 5.5 4z"/></symbol>
+    <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
+    <symbol id="i-thread" viewBox="0 0 24 24"><path d="M4 5v6a3 3 0 0 0 3 3h3M4 5h16M10 14h10M10 20h10M4 14v6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-back" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
+    <symbol id="i-chevron" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-voice" viewBox="0 0 24 24"><path d="M12 4v16M8 8v8M4 11v2M16 8v8M20 11v2" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
+  </svg>
+
+  <header class="topbar" id="topbar">
+    <div class="topbar-row">
+      <span class="logo" aria-hidden="true"><svg class="ic"><use href="#i-voice"/></svg></span>
+      <nav id="feeds" class="feeds" aria-label="Which stories to show"></nav>
+      <button id="voice-toggle" class="icon-btn sm" aria-label="Settings" aria-expanded="false" aria-controls="settings">
+        <svg class="ic"><use href="#i-menu"/></svg>
+      </button>
+    </div>
+    <div id="subbar" class="subbar" hidden>
+      <nav id="modes" class="modes" aria-label="How much of each day to show"></nav>
+      <span id="count" class="list-info"></span>
+    </div>
+    <div id="settings" class="settings" hidden>
+      <label for="voice">Voice</label>
+      <select id="voice"></select>
+      <label for="theme">Theme</label>
+      <select id="theme">
+        <option value="system">Match device</option>
+        <option value="light">Light</option>
+        <option value="dark">Dark</option>
+      </select>
+      <div id="library" class="library" aria-label="Archived and ignored stories"></div>
+      <p id="count2" class="list-info"></p>
+    </div>
+  </header>
+
+  <main>
+    <h1 id="feed-title" class="sr">Stories</h1>
+    <p id="status" class="status" role="status"></p>
+    <ol id="stories" class="stories"></ol>
+  </main>
+
+  <section id="player" class="player" hidden aria-label="Story">
+    <!-- One slim bar stays at the top while reading: back, the title, and Listen (or the mini player). -->
+    <header class="reader-bar">
+      <div class="reader-bar-inner">
+        <button id="back" class="icon-btn sm" aria-label="Back to stories">
+          <svg class="ic"><use href="#i-back"/></svg>
+        </button>
+        <div class="bar-text">
+          <p id="bar-title" class="bar-title"></p>
+          <p id="now" class="now" role="status"></p>
+        </div>
+        <div id="listen-prompt" class="listen-prompt">
+          <button id="listen-btn" class="listen-btn" title="The voice is made when you press this"><svg class="ic"><use href="#i-play"/></svg>Listen</button>
+        </div>
+        <div id="mini" class="mini" hidden>
+          <button id="speed-btn" class="pill" aria-label="Playback speed">1.5x</button>
+          <button id="prev" class="icon-btn sm" aria-label="Previous"><svg class="ic"><use href="#i-prev"/></svg></button>
+          <button id="play" class="play-btn" aria-label="Play"><svg class="ic"><use id="play-icon" href="#i-play"/></svg></button>
+          <button id="next" class="icon-btn sm" aria-label="Next"><svg class="ic"><use href="#i-next"/></svg></button>
+          <button id="skip-story" class="icon-btn sm skip" aria-label="Skip to next story"><svg class="ic"><use href="#i-skip"/></svg></button>
+          <button id="mini-collapse" class="icon-btn sm" aria-label="Shrink player" aria-expanded="true"><svg class="ic chevron"><use href="#i-chevron"/></svg></button>
+        </div>
+      </div>
+      <div class="progress" aria-hidden="true"><div id="progress-bar"></div></div>
+    </header>
+
+    <div class="reader-head">
+      <h2 id="player-title" class="sr"></h2>
+      <div class="reader-meta">
+        <p id="player-links" class="links"></p>
+        <button id="deepen-btn" class="deepen-btn" hidden title="Claude reads the whole thread and finds the debates">Analyze in depth</button>
+        <div id="picks-toggle" class="chips" role="group" aria-label="Comment picker"></div>
+      </div>
+      <div id="prepare-prompt" class="prepare-prompt" hidden>
+        <p id="prepare-text"></p>
+        <button id="prepare-btn" class="listen-btn">Prepare to listen</button>
+      </div>
+      <p id="player-note" class="note" hidden></p>
+    </div>
+    <ol id="segments" class="segments"></ol>
+    <footer class="reader-foot">
+      <p id="analysis-note" class="audio-note" hidden>
+        <span id="analysis-text"></span>
+        <button id="refresh-analysis" class="linkish">Refresh analysis</button>
+      </p>
+      <p id="audio-note" class="audio-note" hidden>
+        <span id="audio-size"></span>
+        <button id="clear-audio" class="linkish">Clear voice files</button>
+      </p>
+    </footer>
+  </section>
+
+  <!-- A comment in its whole conversation, as a sheet over the article, with that comment marked. -->
+  <div id="thread" class="thread" hidden role="dialog" aria-modal="true" aria-labelledby="thread-title">
+    <div id="thread-backdrop" class="thread-backdrop"></div>
+    <section class="thread-sheet">
+      <header class="thread-bar">
+        <div class="thread-heading">
+          <p id="thread-title" class="thread-title">Thread</p>
+          <p id="thread-sub" class="thread-sub"></p>
+        </div>
+        <button id="thread-close" class="icon-btn sm" aria-label="Close thread"><svg class="ic"><use href="#i-close"/></svg></button>
+      </header>
+      <div id="thread-body" class="thread-body"></div>
+      <footer class="thread-foot"><a id="thread-hn" href="#" target="_blank" rel="noopener">Open the discussion on Hacker News ↗</a></footer>
+    </section>
+  </div>
+
+  <audio id="audio" preload="auto"></audio>
+  <script type="module" src="/static/app.js"></script>
+</body>
+</html>
