@@ -9,6 +9,11 @@
   <img src="docs/overview.png" alt="Four screens: the Daily list, a story summary, thread sentiment and a full comment thread">
 </p>
 
+<p align="center">
+  <img src="docs/desktop.png" width="80%" alt="The same story in a desktop browser">
+  <br><sub>Built for a phone, and works in any desktop browser too.</sub>
+</p>
+
 ## Features
 
 - **Article summaries.** A short gist and key points, written for listening.
@@ -20,6 +25,7 @@
 - **Daily lists.** The best 5, 10 or 20 stories of each day, plus Top, 24h, 48h, Week and Best.
 - **Hot stories.** Upvote and comment counts turn orange when a story is climbing fast or very busy.
 - **Cheap.** About 8,000 Claude tokens and $0.002 of Jev per story, ready in about 15 seconds.
+- **Phone or desktop.** Made for a phone-sized screen, and works in any browser. Use `--lan` to open it from your phone.
 - **Private.** No account, no hosting. Everything stays on your machine.
 
 ## Get started
