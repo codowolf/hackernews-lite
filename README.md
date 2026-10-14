@@ -1,6 +1,6 @@
 # Hackernews Lite
 
-**Hacker News, read for you.** Summarizes each article, picks the comments worth reading, measures whether the thread agrees or pushes back, and reads it all aloud. Runs on your own machine.
+**Summaries, the best comments, and the thread's verdict, for every Hacker News story.** Read aloud with a local voice. Runs on your own machine.
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 ![Python 3.12+](https://img.shields.io/badge/python-3.12%2B-blue.svg)

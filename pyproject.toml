@@ -1,7 +1,7 @@
 [project]
 name = "hackernews-lite"
 version = "0.1.0"
-description = "Hacker News, summarized and read aloud: article summaries, curated comments and a local reader."
+description = "Summaries, the best comments, and the thread's verdict, for every Hacker News story."
 license = "MIT"
 license-files = ["LICENSE"]
 readme = "README.md"
