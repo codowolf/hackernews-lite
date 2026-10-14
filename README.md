@@ -6,10 +6,7 @@
 ![Python 3.12+](https://img.shields.io/badge/python-3.12%2B-blue.svg)
 
 <p align="center">
-  <img src="docs/screenshots/list.png" width="23%" alt="Daily list with hot stories in orange">
-  <img src="docs/screenshots/story.png" width="23%" alt="Article gist and key points">
-  <img src="docs/screenshots/reaction.png" width="23%" alt="Thread sentiment: agree, disagree, mixed, neutral">
-  <img src="docs/screenshots/thread.png" width="23%" alt="Full comment thread in a sheet">
+  <img src="docs/overview.png" alt="Four screens: the Daily list, a story summary, thread sentiment and a full comment thread">
 </p>
 
 ## Features
